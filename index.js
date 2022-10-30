@@ -44,54 +44,86 @@ app.get("/", (req, res) => {
 });
 
 
-// create users
-app.get("/account/create/:name/:email/:password", (req, res) => {
-  dal
-    .create(req.params.name, req.params.email, req.params.password)
-    .then((user) => {
-      console.log(user);
-      res.send(user);
-    });
+// create users  done
+
+app.get('/account/create/:name/:email/:password', function (req, res) {
+   dal.create(req.params.name,req.params.email,req.params.password).
+                  then((user) => {
+                      console.log(user);
+                      res.send(user);            
+                  }); 
+  // check if account exists
+ 
 });
-
-
- //GET ALL USERS
-app.get("/account/all", (req, res) => {
-  dal.all().then((docs) => {
-    console.log(docs);
-    res.send(docs);
-  });
-});
-
-// update
-app.put("/account/update/:email/:amount", (req, res) => {
-  dal.update(req.params.email , req.params.amount)
-  .then((dl) => {
-    console.log(dl);
-    res.send(dl);
-  });
-});
-
-
-
-
-app.get("/account/:email", (req, res) => {
-  dal.find(req.params.email)
-  .then((dull) => {
-    console.log(dull);
-    res.send(dull);
-  });
-});
-
-
 
 //login
-// app.get("/account/login/:email/:password", (req, res) => {
-//   res.send({
-//     email: req.params.email,
-//     password: req.params.password,
+app.get('/account/login/:email/:password', function (req, res) {
+  dal.find(req.params.email).
+        then((user) => {
+            // if user exists, check password
+            
+            if(user){
+                if (user.password === req.params.password){
+                    res.send(user).res.status(200);
+                }
+                else{
+                    res.send('Login failed: wrong password').res.status(401);
+                }
+            }
+            else{
+                res.send('Login failed: user not found');
+            }
+    });
+
+
+//   dal.find(req.params.email).
+//       then((user) => {
+//  console.log(user);
+//           res.send(user);
+//           // if user exists, check password
+         
 //   });
-// });
+  
+});
+
+// find user account
+app.get('/account/users/:email', function (req, res) {
+
+  dal.find(req.params.email).
+      then((user) => {
+          console.log(user);
+          res.send(user);
+  });
+});
+
+// find one user by email - alternative to find
+app.get('/account/findOne/:email', function (req, res) {
+
+  dal.findOne(req.params.email).
+      then((user) => {
+          console.log(user);
+          res.send(user);
+  });
+});
+// update - deposit/withdrw amount
+app.get('/account/change/:email/:amount', function (req, res) {
+  dal.update(req.params.email, req.params.amount).
+      then((response) => {
+          console.log(response);
+          res.send(response);
+  });    
+});
+
+
+// all accounts
+app.get('/account/all', function (req, res) {
+  dal.all().
+      then((docs) => {
+          console.log(docs);
+          res.send(docs);
+  });
+});
+
 
 
 
